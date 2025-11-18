@@ -30,8 +30,8 @@ Step 7: Save and run the application.
 ```
 /*
 Program to create and design an android application Send SMS using Intent.
-Developed by: BERI MOTHISH KUMAR
-Registeration Number : 212221040027
+Developed by: Surendhar A
+Registeration Number : 212222110049
 */
 ```
 
