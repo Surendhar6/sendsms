@@ -35,106 +35,61 @@ Registeration Number : 212222110049
 */
 ```
 
-### In activity_main.xml
-```
+## ACTIVITY_MAIN.XML
+```XML
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:padding="16dp"
+    android:gravity="center">
 
     <EditText
-        android:id="@+id/editTextText"
-        android:layout_width="wrap_content"
+        android:id="@+id/editTextPhoneNumber"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="text"
-        android:hint="enter message"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.223"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.209" />
-
-    <EditText
-        android:id="@+id/editTextPhone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="enter phone"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        android:hint="Recipient's Phone Number"
         android:inputType="phone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.223"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.307" />
+        android:textColor="@color/black"
+        android:textSize="18sp"/>
+
+    <EditText
+        android:id="@+id/editTextMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/editTextPhoneNumber"
+        android:layout_marginTop="16dp"
+        android:layout_centerHorizontal="true"
+        android:hint="Message"
+        android:textColor="@color/black"
+        android:textSize="18sp"/>
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/buttonSend"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="send"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.512"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.427" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_below="@id/editTextMessage"
+        android:layout_marginTop="16dp"
+        android:layout_centerHorizontal="true"
+        android:text="Send"
+        android:textColor="@color/white"/>
+
+</RelativeLayout>
+
 ```
-
-### In MainActivity.java
-```
-package com.example.sendsms;
-
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-
-public class MainActivity extends AppCompatActivity {
-EditText message,phone_number;
-Button send;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        message=findViewById(R.id.editTextText);
-        phone_number=findViewById(R.id.editTextPhone);
-        send=findViewById(R.id.button);
-        send.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                sendSMS();
-            }
-        });
-    }
-
-    private void sendSMS() {
-        String msg=message.getText().toString();
-        String phoneNo=phone_number.getText().toString();
-        Intent intent=new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse("sms:"+phoneNo));
-        intent.putExtra("sms_body",msg);
-        startActivity(intent);
-    }
-}
-```
-
-### In AndroidManifest.xml
-```
+## ANDROID_MANIFEST.XML
+```XML
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-<uses-permission android:name="android.permission.SEND_SMS"></uses-permission>
+
+    <uses-feature
+        android:name="android.hardware.telephony"
+        android:required="false" />
+    <uses-permission android:name="android.permission.SEND_SMS"/>
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -143,7 +98,7 @@ Button send;
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.SendSMS"
+        android:theme="@style/Theme.SMS"
         tools:targetApi="31">
         <activity
             android:name=".MainActivity"
@@ -159,10 +114,59 @@ Button send;
 </manifest>
 ```
 
+## MAIN_ACTIVITY.JAVA
+```JAVA
+package com.example.sms;
+
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.telephony.SmsManager;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+
+public class MainActivity extends AppCompatActivity {
+    EditText phonenumber,message;
+    Button send;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+        send=findViewById(R.id.buttonSend);
+        phonenumber=findViewById(R.id.editTextPhoneNumber);
+        message=findViewById(R.id.editTextMessage);
+        send.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendSMS();
+            }
+        });
+
+        }
+
+    private void sendSMS() {
+        String msg=message.getText().toString();
+        String phoneNo=phonenumber.getText().toString();
+        Intent intent=new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse("sms:"+phoneNo));
+        intent.putExtra("sms_body",msg);
+        startActivity(intent);
+    }
+}
+```
+
 ## OUTPUT
-![sms1](https://github.com/pradxxsh/sendsms/assets/131758539/1289e258-fc33-47cb-b334-4d32722ee847)
-
-![akash](https://github.com/21002624/sendsms/assets/113762183/c2c351ee-99b1-40d0-b06d-5552692dadc9)
-
+![pic2](https://github.com/ArpanBardhan/sendsms/assets/119405037/f14bcf64-e716-4945-b0d0-4a0c487a32f9)
+![pic1](https://github.com/ArpanBardhan/sendsms/assets/119405037/f5d72ff7-2dc0-4782-8ff3-3e9bb2ab67a1)
 ## RESULT
 Thus a Simple Android Application create and design an android application Send SMS using Intent using Android Studio is developed and executed successfully.
